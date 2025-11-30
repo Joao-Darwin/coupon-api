@@ -27,7 +27,7 @@ public class Coupon implements Serializable {
     private UUID id;
     @Column(nullable = false, length = 6)
     private String code;
-    @Column(nullable = false)
+    @Column(nullable = false, length = 300)
     private String description;
     @Column(nullable = false, columnDefinition = "integer CHECK (discount_value >= 0.5)")
     private Double discountValue;
