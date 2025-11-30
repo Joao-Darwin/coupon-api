@@ -1,8 +1,15 @@
 package com.coupon.api.controllers.coupons.impl;
 
 import com.coupon.api.controllers.coupons.ICouponController;
+import com.coupon.api.dtos.coupons.request.CreateCouponDTO;
+import com.coupon.api.dtos.coupons.response.CouponDTO;
 import com.coupon.api.services.CouponService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,5 +22,12 @@ public class CouponController implements ICouponController {
     @Autowired
     public CouponController(CouponService couponService) {
         this.couponService = couponService;
+    }
+
+    @PostMapping
+    public ResponseEntity<CouponDTO> create(@Valid @RequestBody CreateCouponDTO createCouponDTO) {
+        CouponDTO couponCreated = couponService.create(createCouponDTO);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(couponCreated);
     }
 }
