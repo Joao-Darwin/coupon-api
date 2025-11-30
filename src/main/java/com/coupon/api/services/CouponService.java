@@ -55,4 +55,20 @@ public class CouponService {
     private String removeSpecialCharacters(String code) {
         return code.replaceAll("[^A-Za-z0-9]", "");
     }
+
+    public CouponDTO findById(UUID id) {
+        Coupon coupon = couponRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException("Cupom não encontrado"));
+
+        return new CouponDTO(
+                coupon.getId(),
+                coupon.getCode(),
+                coupon.getDescription(),
+                coupon.getDiscountValue().doubleValue(),
+                coupon.getExpirationDate(),
+                coupon.getStatus(),
+                coupon.isPublished(),
+                coupon.isRedeemed()
+        );
+    }
 }
