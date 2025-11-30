@@ -1,6 +1,7 @@
 package com.coupon.api.exceptions.handler;
 
 import com.coupon.api.dtos.exceptions.response.ResponseEntityException;
+import com.coupon.api.exceptions.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -23,6 +24,13 @@ public class CustomizeExceptionHandler {
         ResponseEntityException responseEntityException = new ResponseEntityException(Instant.now(), exception.getMessage(), webRequest.getDescription(false));
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseEntityException);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ResponseEntityException> handlerAllExceptions(BadRequestException exception, WebRequest webRequest) {
+        ResponseEntityException responseEntityException = new ResponseEntityException(Instant.now(), exception.getMessage(), webRequest.getDescription(false));
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseEntityException);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
