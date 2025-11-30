@@ -3,6 +3,7 @@ package com.coupon.api.services;
 import com.coupon.api.dtos.coupons.request.CreateCouponDTO;
 import com.coupon.api.dtos.coupons.response.CouponDTO;
 import com.coupon.api.exceptions.BadRequestException;
+import com.coupon.api.exceptions.NotFoundException;
 import com.coupon.api.models.Coupon;
 import com.coupon.api.models.enums.CouponStatus;
 import com.coupon.api.repositories.CouponRepository;
@@ -142,18 +143,18 @@ public class CouponServiceTest {
     }
 
     @Test
-    void testFindById_GivenInvalidId_ShouldThrowABadRequestException() {
+    void testFindById_GivenInvalidId_ShouldThrowANotFoundException() {
         UUID id = UUID.randomUUID();
         String exceptionMessage = "Cupom não encontrado";
 
         Mockito.when(couponRepository.findById(id)).thenReturn(Optional.empty());
 
-        BadRequestException badRequestException = Assertions.assertThrows(
-                BadRequestException.class,
+        NotFoundException exception = Assertions.assertThrows(
+                NotFoundException.class,
                 () -> couponService.findById(id)
         );
 
-        Assertions.assertEquals(exceptionMessage, badRequestException.getMessage());
+        Assertions.assertEquals(exceptionMessage, exception.getMessage());
 
         Mockito.verify(couponRepository).findById(id);
     }
@@ -205,13 +206,13 @@ public class CouponServiceTest {
     }
 
     @Test
-    void testDelete_GivenInvalidId_ShouldThrowABadRequestException() {
+    void testDelete_GivenInvalidId_ShouldThrowANotFoundException() {
         UUID id = UUID.randomUUID();
 
         Mockito.when(couponRepository.findByIdAndIsNotDelete(id)).thenReturn(Optional.empty());
 
-        BadRequestException exception = Assertions.assertThrows(
-                BadRequestException.class,
+        NotFoundException exception = Assertions.assertThrows(
+                NotFoundException.class,
                 () -> couponService.delete(id)
         );
 
@@ -222,13 +223,13 @@ public class CouponServiceTest {
     }
 
     @Test
-    void testDelete_GivenIdFromDeletedCoupon_ShouldThrowABadRequestException() {
+    void testDelete_GivenIdFromDeletedCoupon_ShouldThrowANotFoundException() {
         UUID id = UUID.randomUUID();
 
         Mockito.when(couponRepository.findByIdAndIsNotDelete(id)).thenReturn(Optional.empty());
 
-        BadRequestException exception = Assertions.assertThrows(
-                BadRequestException.class,
+        NotFoundException exception = Assertions.assertThrows(
+                NotFoundException.class,
                 () -> couponService.delete(id)
         );
 

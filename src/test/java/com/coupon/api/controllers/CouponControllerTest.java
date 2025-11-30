@@ -4,6 +4,7 @@ import com.coupon.api.controllers.coupons.impl.CouponController;
 import com.coupon.api.dtos.coupons.request.CreateCouponDTO;
 import com.coupon.api.dtos.coupons.response.CouponDTO;
 import com.coupon.api.exceptions.BadRequestException;
+import com.coupon.api.exceptions.NotFoundException;
 import com.coupon.api.models.enums.CouponStatus;
 import com.coupon.api.services.CouponService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -131,13 +132,13 @@ public class CouponControllerTest {
         UUID id = UUID.randomUUID();
         String exceptionMessage = "Cupom não encontrado";
 
-        Mockito.when(couponService.findById(id)).thenThrow(new BadRequestException(exceptionMessage));
+        Mockito.when(couponService.findById(id)).thenThrow(new NotFoundException(exceptionMessage));
 
         ResultActions result = mockMvc
                 .perform(MockMvcRequestBuilders.get(basePath + "/" + id)
                         .contentType(MediaType.APPLICATION_JSON));
 
-        result.andExpect(MockMvcResultMatchers.status().isBadRequest());
+        result.andExpect(MockMvcResultMatchers.status().isNotFound());
         result.andExpect(MockMvcResultMatchers.jsonPath("$.message").value(exceptionMessage));
 
         Mockito.verify(couponService).findById(id);
@@ -163,13 +164,13 @@ public class CouponControllerTest {
         UUID id = UUID.randomUUID();
         String exceptionMessage = "Cupom não encontrado ou já excluído";
 
-        Mockito.doThrow(new BadRequestException(exceptionMessage)).when(couponService).delete(id);
+        Mockito.doThrow(new NotFoundException(exceptionMessage)).when(couponService).delete(id);
 
         ResultActions result = mockMvc
                 .perform(MockMvcRequestBuilders.delete(basePath + "/" + id)
                         .contentType(MediaType.APPLICATION_JSON));
 
-        result.andExpect(MockMvcResultMatchers.status().isBadRequest());
+        result.andExpect(MockMvcResultMatchers.status().isNotFound());
         result.andExpect(MockMvcResultMatchers.jsonPath("$.message").value(exceptionMessage));
 
         Mockito.verify(couponService).delete(id);
