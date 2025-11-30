@@ -1,0 +1,9 @@
+services:
+  coupon-api:
+    container_name: coupon-api
+    build: ./
+    ports:
+      - "8080:8080"
+    expose:
+      - 8080
+    command: mvn spring-boot:run
