@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -31,14 +32,14 @@ public class CouponServiceTest {
         String code = "ABC-123";
         String cleanCode = "ABC123";
         String description = "Foo Bar";
-        Double discountValue = 0.8;
+        BigDecimal discountValue = BigDecimal.valueOf(0.8);
         LocalDateTime expirationDate = LocalDateTime.now();
         boolean published = false;
 
         CreateCouponDTO createCouponDTO = new CreateCouponDTO(
                 code,
                 description,
-                discountValue,
+                discountValue.doubleValue(),
                 expirationDate,
                 published
         );
@@ -63,7 +64,7 @@ public class CouponServiceTest {
         Assertions.assertEquals(couponExpected.getId(), actualCoupon.id());
         Assertions.assertEquals(cleanCode, actualCoupon.code());
         Assertions.assertEquals(description, actualCoupon.description());
-        Assertions.assertEquals(discountValue, actualCoupon.discountValue());
+        Assertions.assertEquals(discountValue.doubleValue(), actualCoupon.discountValue());
         Assertions.assertEquals(expirationDate, actualCoupon.expirationDate());
         Assertions.assertEquals(CouponStatus.ACTIVE, actualCoupon.status());
         Assertions.assertFalse(actualCoupon.published());

@@ -13,6 +13,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -29,8 +30,8 @@ public class Coupon implements Serializable {
     private String code;
     @Column(nullable = false, length = 300)
     private String description;
-    @Column(nullable = false, columnDefinition = "integer CHECK (discount_value >= 0.5)")
-    private Double discountValue;
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal discountValue;
     private LocalDateTime expirationDate;
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
@@ -49,7 +50,7 @@ public class Coupon implements Serializable {
     public Coupon() {
     }
 
-    public Coupon(UUID id, String code, String description, Double discountValue, LocalDateTime expirationDate, LocalDateTime createdAt, LocalDateTime updatedAt, CouponStatus status, boolean published, boolean redeemed) {
+    public Coupon(UUID id, String code, String description, BigDecimal discountValue, LocalDateTime expirationDate, LocalDateTime createdAt, LocalDateTime updatedAt, CouponStatus status, boolean published, boolean redeemed) {
         this.id = id;
         this.code = code;
         this.description = description;
@@ -86,11 +87,11 @@ public class Coupon implements Serializable {
         this.description = description;
     }
 
-    public Double getDiscountValue() {
+    public BigDecimal getDiscountValue() {
         return discountValue;
     }
 
-    public void setDiscountValue(Double discountValue) {
+    public void setDiscountValue(BigDecimal discountValue) {
         this.discountValue = discountValue;
     }
 

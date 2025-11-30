@@ -8,6 +8,9 @@ import com.coupon.api.repositories.CouponRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.UUID;
+
 @Service
 public class CouponService {
 
@@ -31,7 +34,7 @@ public class CouponService {
 
         couponToCreate.setCode(cleanCode);
         couponToCreate.setDescription(createCouponDTO.description());
-        couponToCreate.setDiscountValue(createCouponDTO.discountValue());
+        couponToCreate.setDiscountValue(BigDecimal.valueOf(createCouponDTO.discountValue()));
         couponToCreate.setExpirationDate(createCouponDTO.expirationDate());
         couponToCreate.setPublished(createCouponDTO.published());
 
@@ -41,7 +44,7 @@ public class CouponService {
                 couponCreated.getId(),
                 couponCreated.getCode(),
                 couponCreated.getDescription(),
-                couponCreated.getDiscountValue(),
+                couponCreated.getDiscountValue().doubleValue(),
                 couponCreated.getExpirationDate(),
                 couponCreated.getStatus(),
                 couponCreated.isPublished(),
