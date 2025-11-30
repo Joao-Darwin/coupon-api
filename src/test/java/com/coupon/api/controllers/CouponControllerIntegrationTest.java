@@ -2,6 +2,7 @@ package com.coupon.api.controllers;
 
 import com.coupon.api.dtos.coupons.request.CreateCouponDTO;
 import com.coupon.api.dtos.coupons.response.CouponDTO;
+import com.coupon.api.dtos.exceptions.response.ResponseEntityException;
 import com.coupon.api.models.enums.CouponStatus;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
@@ -18,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -118,6 +120,23 @@ public class CouponControllerIntegrationTest {
     }
 
     @Test
+    void integrationTestFindCouponById_GivenInvalidId_ShouldReturnNotFoundHttpCode() {
+        ResponseEntityException response = RestAssured
+                .given()
+                .spec(requestSpecification)
+                .basePath(basePath + "/" + UUID.randomUUID())
+                .when()
+                .get()
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .extract()
+                .body()
+                .as(ResponseEntityException.class);
+
+        Assertions.assertEquals("Cupom não encontrado", response.getMessage());
+    }
+
+    @Test
     void integrationTestDelete_GivenValidId_ShouldDeleteCouponAndReturnNoContent() {
         CouponDTO created = RestAssured
                 .given()
@@ -138,5 +157,59 @@ public class CouponControllerIntegrationTest {
                 .delete()
                 .then()
                 .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    void integrationTestDelete_GivenInvalidId_ShouldReturnNotFoundHttpCode() {
+        ResponseEntityException response = RestAssured
+                .given()
+                .spec(requestSpecification)
+                .basePath(basePath + "/" + UUID.randomUUID())
+                .when()
+                .delete()
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .extract()
+                .body()
+                .as(ResponseEntityException.class);
+
+        Assertions.assertEquals("Cupom não encontrado ou já excluído", response.getMessage());
+    }
+
+    @Test
+    void integrationTestDelete_GivenCouponAlreadyDeleted_ShouldReturnNotFoundHttpCode() {
+        CouponDTO created = RestAssured
+                .given()
+                .spec(requestSpecification)
+                .contentType(ContentType.JSON)
+                .body(couponToCreate)
+                .when()
+                .post()
+                .then()
+                .statusCode(HttpStatus.CREATED.value())
+                .extract().as(CouponDTO.class);
+
+        RestAssured
+                .given()
+                .spec(requestSpecification)
+                .basePath(basePath + "/" + created.id())
+                .when()
+                .delete()
+                .then()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+
+        ResponseEntityException response = RestAssured
+                .given()
+                .spec(requestSpecification)
+                .basePath(basePath + "/" + created.id())
+                .when()
+                .delete()
+                .then()
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .extract()
+                .body()
+                .as(ResponseEntityException.class);
+
+        Assertions.assertEquals("Cupom não encontrado ou já excluído", response.getMessage());
     }
 }
