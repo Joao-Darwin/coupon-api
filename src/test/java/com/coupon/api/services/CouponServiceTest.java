@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
@@ -98,5 +99,62 @@ public class CouponServiceTest {
         Assertions.assertEquals(exceptionMessage, exception.getMessage());
 
         Mockito.verify(couponRepository, Mockito.never()).save(Mockito.any(Coupon.class));
+    }
+
+    @Test
+    void testFindById_GivenValidId_ShouldReturnCoupon() {
+        UUID id = UUID.randomUUID();
+        String code = "ABC123";
+        String description = "Foo Bar";
+        BigDecimal discountValue = BigDecimal.valueOf(0.8);
+        LocalDateTime expirationDate = LocalDateTime.now();
+        CouponStatus status = CouponStatus.ACTIVE;
+        boolean published = false;
+        boolean redeemed = false;
+
+        Coupon couponExpected = new Coupon(
+                id,
+                code,
+                description,
+                discountValue,
+                expirationDate,
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                status,
+                published,
+                redeemed
+        );
+
+        Mockito.when(couponRepository.findById(id)).thenReturn(Optional.of(couponExpected));
+
+        CouponDTO actualCoupon = couponService.findById(id);
+
+        Assertions.assertEquals(id, actualCoupon.id());
+        Assertions.assertEquals(code, actualCoupon.code());
+        Assertions.assertEquals(description, actualCoupon.description());
+        Assertions.assertEquals(discountValue.doubleValue(), actualCoupon.discountValue());
+        Assertions.assertEquals(expirationDate, actualCoupon.expirationDate());
+        Assertions.assertEquals(status, actualCoupon.status());
+        Assertions.assertFalse(actualCoupon.published());
+        Assertions.assertFalse(actualCoupon.redeemed());
+
+        Mockito.verify(couponRepository).findById(id);
+    }
+
+    @Test
+    void testFindById_GivenInvalidId_ShouldThrowABadRequestException() {
+        UUID id = UUID.randomUUID();
+        String exceptionMessage = "Cupom não encontrado";
+
+        Mockito.when(couponRepository.findById(id)).thenReturn(Optional.empty());
+
+        BadRequestException badRequestException = Assertions.assertThrows(
+                BadRequestException.class,
+                () -> couponService.findById(id)
+        );
+
+        Assertions.assertEquals(exceptionMessage, badRequestException.getMessage());
+
+        Mockito.verify(couponRepository).findById(id);
     }
 }
