@@ -49,6 +49,19 @@ public class Coupon implements Serializable {
     public Coupon() {
     }
 
+    public Coupon(UUID id, String code, String description, Double discountValue, LocalDateTime expirationDate, LocalDateTime createdAt, LocalDateTime updatedAt, CouponStatus status, boolean published, boolean redeemed) {
+        this.id = id;
+        this.code = code;
+        this.description = description;
+        this.discountValue = discountValue;
+        this.expirationDate = expirationDate;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.status = status;
+        this.published = published;
+        this.redeemed = redeemed;
+    }
+
     public UUID getId() {
         return id;
     }
