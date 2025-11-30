@@ -37,7 +37,7 @@ Certifique-se de ter instalado em sua máquina:
 
 1.  **Clone o repositório:**
     ```bash
-    git clone [https://github.com/Joao-Darwin/coupon-api.git](https://github.com/Joao-Darwin/coupon-api.git)
+    git clone https://github.com/Joao-Darwin/coupon-api.git
     cd coupon-api
     ```
 
@@ -49,11 +49,12 @@ Certifique-se de ter instalado em sua máquina:
     A aplicação estará rodando em `http://localhost:8080`.
 
 3.  **Compile e Execute:**
+    Caso queira executar fora do docker:
     ```bash
     mvn spring-boot:run
     ```
 
-4.  **Acesse a API:**
+5.  **Acesse a API:**
     A aplicação estará rodando em `http://localhost:8080`.
 
 ## 🔌 Documentação da API (Exemplos)
