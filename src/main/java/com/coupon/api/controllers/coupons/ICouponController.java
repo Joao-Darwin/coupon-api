@@ -9,4 +9,5 @@ import java.util.UUID;
 public interface ICouponController {
     ResponseEntity<CouponDTO> create(CreateCouponDTO createCouponDTO);
     ResponseEntity<CouponDTO> findById(UUID id);
+    ResponseEntity<Void> delete(UUID id);
 }
