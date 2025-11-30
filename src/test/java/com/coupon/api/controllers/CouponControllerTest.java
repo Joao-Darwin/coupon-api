@@ -3,6 +3,7 @@ package com.coupon.api.controllers;
 import com.coupon.api.controllers.coupons.impl.CouponController;
 import com.coupon.api.dtos.coupons.request.CreateCouponDTO;
 import com.coupon.api.dtos.coupons.response.CouponDTO;
+import com.coupon.api.exceptions.BadRequestException;
 import com.coupon.api.models.enums.CouponStatus;
 import com.coupon.api.services.CouponService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -69,7 +70,7 @@ public class CouponControllerTest {
 
         ResultActions result = mockMvc
                 .perform(MockMvcRequestBuilders.post(basePath)
-                .contentType(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(createCouponDTO)));
 
         result.andExpect(MockMvcResultMatchers.status().isCreated());
@@ -83,5 +84,63 @@ public class CouponControllerTest {
         result.andExpect(MockMvcResultMatchers.jsonPath("$.redeemed").value(redeemed));
 
         Mockito.verify(couponService).create(Mockito.any(CreateCouponDTO.class));
+    }
+
+    @Test
+    void testFindById_GivenValidId_ShouldReturnOkHttpCodeWithCouponOnBody() throws Exception {
+        UUID id = UUID.randomUUID();
+        String code = "ABC123";
+        String description = "Foo Bar";
+        Double discountValue = 0.8;
+        LocalDateTime expirationDate = LocalDateTime.of(2050, 12, 1, 5, 5, 15);
+        CouponStatus status = CouponStatus.ACTIVE;
+        boolean published = false;
+        boolean redeemed = false;
+
+        CouponDTO couponDTO = new CouponDTO(
+                id,
+                code,
+                description,
+                discountValue,
+                expirationDate,
+                status,
+                published,
+                redeemed
+        );
+
+        Mockito.when(couponService.findById(id)).thenReturn(couponDTO);
+
+        ResultActions result = mockMvc
+                .perform(MockMvcRequestBuilders.get(basePath + "/" + id)
+                        .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isOk());
+        result.andExpect(MockMvcResultMatchers.jsonPath("$.id").value(couponDTO.id().toString()));
+        result.andExpect(MockMvcResultMatchers.jsonPath("$.code").value(code));
+        result.andExpect(MockMvcResultMatchers.jsonPath("$.description").value(description));
+        result.andExpect(MockMvcResultMatchers.jsonPath("$.discountValue").value(discountValue));
+        result.andExpect(MockMvcResultMatchers.jsonPath("$.expirationDate").value(expirationDate.toString()));
+        result.andExpect(MockMvcResultMatchers.jsonPath("$.status").value(status.toString()));
+        result.andExpect(MockMvcResultMatchers.jsonPath("$.published").value(published));
+        result.andExpect(MockMvcResultMatchers.jsonPath("$.redeemed").value(redeemed));
+
+        Mockito.verify(couponService).findById(id);
+    }
+
+    @Test
+    void testFindById_GivenInvalidId_ShouldReturnBadRequestHttpCode() throws Exception {
+        UUID id = UUID.randomUUID();
+        String exceptionMessage = "Cupom não encontrado";
+
+        Mockito.when(couponService.findById(id)).thenThrow(new BadRequestException(exceptionMessage));
+
+        ResultActions result = mockMvc
+                .perform(MockMvcRequestBuilders.get(basePath + "/" + id)
+                        .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest());
+        result.andExpect(MockMvcResultMatchers.jsonPath("$.message").value(exceptionMessage));
+
+        Mockito.verify(couponService).findById(id);
     }
 }
