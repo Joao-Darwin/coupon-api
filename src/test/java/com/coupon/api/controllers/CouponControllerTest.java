@@ -6,7 +6,6 @@ import com.coupon.api.dtos.coupons.response.CouponDTO;
 import com.coupon.api.exceptions.BadRequestException;
 import com.coupon.api.models.enums.CouponStatus;
 import com.coupon.api.services.CouponService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -142,5 +141,54 @@ public class CouponControllerTest {
         result.andExpect(MockMvcResultMatchers.jsonPath("$.message").value(exceptionMessage));
 
         Mockito.verify(couponService).findById(id);
+    }
+
+    @Test
+    void testDelete_GivenValidId_ShouldReturnNoContentCode() throws Exception {
+        UUID id = UUID.randomUUID();
+
+        Mockito.doNothing().when(couponService).delete(id);
+
+        ResultActions result = mockMvc
+                .perform(MockMvcRequestBuilders.delete(basePath + "/" + id)
+                        .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isNoContent());
+
+        Mockito.verify(couponService).delete(id);
+    }
+
+    @Test
+    void testDelete_GivenInvalidId_ShouldReturnBadRequestCode() throws Exception {
+        UUID id = UUID.randomUUID();
+        String exceptionMessage = "Cupom não encontrado ou já excluído";
+
+        Mockito.doThrow(new BadRequestException(exceptionMessage)).when(couponService).delete(id);
+
+        ResultActions result = mockMvc
+                .perform(MockMvcRequestBuilders.delete(basePath + "/" + id)
+                        .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest());
+        result.andExpect(MockMvcResultMatchers.jsonPath("$.message").value(exceptionMessage));
+
+        Mockito.verify(couponService).delete(id);
+    }
+
+    @Test
+    void testDelete_GivenIdFromDeletedCoupon_ShouldReturnBadRequestCode() throws Exception {
+        UUID id = UUID.randomUUID();
+        String exceptionMessage = "Cupom não encontrado ou já excluído";
+
+        Mockito.doThrow(new BadRequestException(exceptionMessage)).when(couponService).delete(id);
+
+        ResultActions result = mockMvc
+                .perform(MockMvcRequestBuilders.delete(basePath + "/" + id)
+                        .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest());
+        result.andExpect(MockMvcResultMatchers.jsonPath("$.message").value(exceptionMessage));
+
+        Mockito.verify(couponService).delete(id);
     }
 }
