@@ -1,0 +1,6 @@
+base-path: "/api/v1"
+cors:
+  origins: "*"
+spring:
+  application:
+    name: api
