@@ -157,4 +157,84 @@ public class CouponServiceTest {
 
         Mockito.verify(couponRepository).findById(id);
     }
+
+    @Test
+    void testDelete_GivenValidId_ShouldUpdateCouponStatusToDelete() {
+        UUID id = UUID.randomUUID();
+        String code = "ABC123";
+        String description = "Foo Bar";
+        BigDecimal discountValue = BigDecimal.valueOf(0.8);
+        LocalDateTime expirationDate = LocalDateTime.now();
+        CouponStatus status = CouponStatus.ACTIVE;
+        boolean published = false;
+        boolean redeemed = false;
+
+        Coupon coupon = new Coupon(
+                id,
+                code,
+                description,
+                discountValue,
+                expirationDate,
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                status,
+                published,
+                redeemed
+        );
+
+        Coupon updatedCoupon = new Coupon(
+                id,
+                code,
+                description,
+                discountValue,
+                expirationDate,
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                CouponStatus.DELETED,
+                published,
+                redeemed
+        );
+
+        Mockito.when(couponRepository.findByIdAndIsNotDelete(id)).thenReturn(Optional.of(coupon));
+        Mockito.when(couponRepository.save(Mockito.any(Coupon.class))).thenReturn(updatedCoupon);
+
+        couponService.delete(id);
+
+        Mockito.verify(couponRepository).findByIdAndIsNotDelete(id);
+        Mockito.verify(couponRepository).save(Mockito.any(Coupon.class));
+    }
+
+    @Test
+    void testDelete_GivenInvalidId_ShouldThrowABadRequestException() {
+        UUID id = UUID.randomUUID();
+
+        Mockito.when(couponRepository.findByIdAndIsNotDelete(id)).thenReturn(Optional.empty());
+
+        BadRequestException exception = Assertions.assertThrows(
+                BadRequestException.class,
+                () -> couponService.delete(id)
+        );
+
+        Assertions.assertEquals("Cupom não encontrado ou já excluído", exception.getMessage());
+
+        Mockito.verify(couponRepository).findByIdAndIsNotDelete(id);
+        Mockito.verify(couponRepository, Mockito.never()).save(Mockito.any(Coupon.class));
+    }
+
+    @Test
+    void testDelete_GivenIdFromDeletedCoupon_ShouldThrowABadRequestException() {
+        UUID id = UUID.randomUUID();
+
+        Mockito.when(couponRepository.findByIdAndIsNotDelete(id)).thenReturn(Optional.empty());
+
+        BadRequestException exception = Assertions.assertThrows(
+                BadRequestException.class,
+                () -> couponService.delete(id)
+        );
+
+        Assertions.assertEquals("Cupom não encontrado ou já excluído", exception.getMessage());
+
+        Mockito.verify(couponRepository).findByIdAndIsNotDelete(id);
+        Mockito.verify(couponRepository, Mockito.never()).save(Mockito.any(Coupon.class));
+    }
 }
