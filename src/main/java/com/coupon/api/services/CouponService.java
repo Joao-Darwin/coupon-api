@@ -4,6 +4,7 @@ import com.coupon.api.dtos.coupons.request.CreateCouponDTO;
 import com.coupon.api.dtos.coupons.response.CouponDTO;
 import com.coupon.api.exceptions.BadRequestException;
 import com.coupon.api.models.Coupon;
+import com.coupon.api.models.enums.CouponStatus;
 import com.coupon.api.repositories.CouponRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -70,5 +71,14 @@ public class CouponService {
                 coupon.isPublished(),
                 coupon.isRedeemed()
         );
+    }
+
+    public void delete(UUID id) {
+        Coupon coupon = couponRepository.findByIdAndIsNotDelete(id)
+                .orElseThrow(() -> new BadRequestException("Cupom não encontrado ou já excluído"));
+
+        coupon.setStatus(CouponStatus.DELETED);
+
+        couponRepository.save(coupon);
     }
 }
