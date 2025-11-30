@@ -3,6 +3,7 @@ package com.coupon.api.services;
 import com.coupon.api.dtos.coupons.request.CreateCouponDTO;
 import com.coupon.api.dtos.coupons.response.CouponDTO;
 import com.coupon.api.exceptions.BadRequestException;
+import com.coupon.api.exceptions.NotFoundException;
 import com.coupon.api.models.Coupon;
 import com.coupon.api.models.enums.CouponStatus;
 import com.coupon.api.repositories.CouponRepository;
@@ -59,7 +60,7 @@ public class CouponService {
 
     public CouponDTO findById(UUID id) {
         Coupon coupon = couponRepository.findById(id)
-                .orElseThrow(() -> new BadRequestException("Cupom não encontrado"));
+                .orElseThrow(() -> new NotFoundException("Cupom não encontrado"));
 
         return new CouponDTO(
                 coupon.getId(),
@@ -75,7 +76,7 @@ public class CouponService {
 
     public void delete(UUID id) {
         Coupon coupon = couponRepository.findByIdAndIsNotDelete(id)
-                .orElseThrow(() -> new BadRequestException("Cupom não encontrado ou já excluído"));
+                .orElseThrow(() -> new NotFoundException("Cupom não encontrado ou já excluído"));
 
         coupon.setStatus(CouponStatus.DELETED);
 
