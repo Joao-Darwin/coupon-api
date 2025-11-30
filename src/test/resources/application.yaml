@@ -1,0 +1,17 @@
+base-path: "/api/v1"
+cors:
+  origins: "*"
+spring:
+  application:
+    name: api
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:coupon-db
+    password: password
+    username: sa
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+server:
+  port: 8888
