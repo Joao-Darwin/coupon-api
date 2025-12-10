@@ -3,6 +3,7 @@ package com.coupon.api.controllers.coupons.impl;
 import com.coupon.api.controllers.coupons.ICouponController;
 import com.coupon.api.dtos.coupons.request.CreateCouponDTO;
 import com.coupon.api.dtos.coupons.response.CouponDTO;
+import com.coupon.api.dtos.coupons.response.CouponRedeemDTO;
 import com.coupon.api.services.CouponService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,13 @@ public class CouponController implements ICouponController {
         CouponDTO couponCreated = couponService.create(createCouponDTO);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(couponCreated);
+    }
+
+    @PostMapping("/{id}/redeem")
+    public ResponseEntity<CouponRedeemDTO> use(@PathVariable UUID id) {
+        CouponRedeemDTO redeemCoupon = couponService.use(id);
+
+        return ResponseEntity.status(HttpStatus.OK).body(redeemCoupon);
     }
 
     @GetMapping("/{id}")
